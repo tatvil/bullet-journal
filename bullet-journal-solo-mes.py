@@ -1,6 +1,7 @@
 from fpdf import FPDF
 import calendar
 from datetime import datetime
+from fpdf.enums import XPos, YPos  # Importar las nuevas posiciones para evitar advertencias
 
 class BulletJournalPDF(FPDF):
     def __init__(self, title=""):
@@ -10,23 +11,23 @@ class BulletJournalPDF(FPDF):
     def header(self):
         # Header con el título en cada página
         self.set_font('Helvetica', 'B', 16)
-        self.cell(0, 10, self.title, 0, 1, 'C')
+        self.cell(0, 10, self.title, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
 
     def add_monthly_view(self, year, month, mes):
         # Agregar la página con el calendario mensual
         self.add_page()
         self.title = f"{mes} de {year}"
         self.set_font('Helvetica', 'B', 16)
-        self.cell(0, 10, self.title, 0, 1, 'C')
+        self.cell(0, 10, self.title, new_x=XPos.LMARGIN, new_y=YPos.NEXT, align='C')
 
         # Nombres de los días de la semana en español
         days_of_week = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
-        day_width = 40  # Ancho de cada día
+        day_width = 27  # Ancho de cada día
         self.set_font('Helvetica', 'B', 12)
 
         # Cabecera con los días de la semana
         for day in days_of_week:
-            self.cell(day_width, 10, day, 0, 0, 'C')  # Sin bordes y centrado
+            self.cell(day_width, 10, day, border=0, new_x=XPos.RIGHT, new_y=YPos.TOP, align='C')
         self.ln(10)  # Salto de línea después de la cabecera
 
         # Obtener el calendario del mes
@@ -37,11 +38,13 @@ class BulletJournalPDF(FPDF):
         for week in cal:
             for day in week:
                 if day != 0:
-                    # Mostrar el número del día sin bordes y alineado a la izquierda
-                    self.cell(day_width, 20, str(day), 0, 0, 'L')
+                    # Mostrar el número del día con bordes y centrado y arriba
+                    self.cell(day_width, 20, str(day), border=1, new_x=XPos.RIGHT, new_y=YPos.TOP, align='L')
+                    #self.cell(day_width, 20, str(day), border=1, new_x=XPos.RIGHT, new_y=YPos.TOP, align='T')
+
                 else:
                     # Celda vacía para días fuera del mes
-                    self.cell(day_width, 20, '', 0, 0, 'L')
+                    self.cell(day_width, 20, '', border=0, new_x=XPos.RIGHT, new_y=YPos.TOP, align='L')
             self.ln(20)  # Salto de línea después de cada semana
 
 # Crear el bullet journal para el mes actual
